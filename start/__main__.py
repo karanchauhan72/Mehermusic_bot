@@ -1,5 +1,7 @@
 from pyrogram import Client, filters
+
 from MeherMusic.config import API_ID, API_HASH, BOT_TOKEN
+from MeherMusic.core.calls import VoiceCallManager
 from MeherMusic.plugins.music import register_music_handlers
 
 
@@ -10,6 +12,7 @@ app = Client(
     bot_token=BOT_TOKEN,
 )
 
+voice = VoiceCallManager(app)
 
 register_music_handlers(app)
 
@@ -18,10 +21,19 @@ register_music_handlers(app)
 async def start_command(client, message):
     await message.reply_text(
         "🎵 **Meher Music Bot**\n\n"
-        "Welcome! Use `/play <song name>` to search music."
+        "Use `/play <song name>` to search music."
     )
 
 
+async def main():
+    await app.start()
+    await voice.start()
+
+    print("🎵 Meher Music started!")
+
+    await app.idle()
+
+
 if __name__ == "__main__":
-    print("🎵 Meher Music Bot is starting...")
-    app.run()
+    import asyncio
+    asyncio.run(main())
