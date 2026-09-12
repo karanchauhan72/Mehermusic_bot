@@ -1,5 +1,6 @@
 from pyrogram import Client, filters
 from MeherMusic.config import API_ID, API_HASH, BOT_TOKEN
+from MeherMusic.plugins.music import register_music_handlers
 
 
 app = Client(
@@ -10,11 +11,14 @@ app = Client(
 )
 
 
+register_music_handlers(app)
+
+
 @app.on_message(filters.command("start"))
 async def start_command(client, message):
     await message.reply_text(
         "🎵 **Meher Music Bot**\n\n"
-        "Welcome! Music bot setup is working. 🚀"
+        "Welcome! Use `/play <song name>` to search music."
     )
 
 
