@@ -1,4 +1,5 @@
 from pyrogram import filters
+
 from MeherMusic.platforms.youtube import YouTube
 from MeherMusic.plugins.queue import MusicQueue
 
@@ -20,21 +21,30 @@ def register_music_handlers(app):
 
         query = " ".join(message.command[1:])
 
-        await message.reply_text(
-            f"🔎 Searching for: **{query}**..."
+        msg = await message.reply_text(
+            f"🔎 Searching for **{query}**..."
         )
 
-        song = youtube.search(query)
+        try:
+            song = youtube.get_stream(query)
 
-        if not song:
-            await message.reply_text(
-                "❌ Song nahi mila."
+            if not song or not song.get("url"):
+                await msg.edit_text(
+                    "❌ Song nahi mila."
+                )
+                return
+
+            music_queue.add(message.chat.id, song)
+
+            await msg.edit_text(
+                f"🎵 **Added to queue**\n\n"
+                f"**{song['title']}**\n\n"
+                f"📋 Queue: `{len(music_queue.get(message.chat.id))}`"
             )
-            return
 
-        music_queue.add(message.chat.id, song)
+        except Exception as error:
+            print(f"Play error: {error}")
 
-        await message.reply_text(
-            f"✅ **Added to queue**\n\n"
-            f"🎵 **{song['title']}**"
-        )
+            await msg.edit_text(
+                "❌ Song process karte waqt error aa gaya."
+            )
