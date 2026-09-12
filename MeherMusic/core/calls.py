@@ -1,16 +1,19 @@
+from pytgcalls import PyTgCalls
+from pytgcalls.types import MediaStream
+
+
 class VoiceCallManager:
-    """Manages music playback voice calls."""
+    def __init__(self, app):
+        self.calls = PyTgCalls(app)
 
-    def __init__(self):
-        self.active_calls = {}
+    async def start(self):
+        await self.calls.start()
 
-    async def join(self, chat_id):
-        """Join a voice chat."""
-        self.active_calls[chat_id] = True
+    async def play(self, chat_id, stream_url):
+        await self.calls.play(
+            chat_id,
+            MediaStream(stream_url)
+        )
 
     async def leave(self, chat_id):
-        """Leave a voice chat."""
-        self.active_calls.pop(chat_id, None)
-
-    def is_active(self, chat_id):
-        return self.active_calls.get(chat_id, False)
+        await self.calls.leave_call(chat_id)
