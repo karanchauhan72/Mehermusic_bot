@@ -2,26 +2,32 @@ import yt_dlp
 
 
 class YouTube:
-    def search(self, query):
+    def get_stream(self, query: str):
         options = {
+            "format": "bestaudio/best",
             "quiet": True,
-            "skip_download": True,
-            "extract_flat": True,
-            "default_search": "ytsearch",
+            "no_warnings": True,
+            "noplaylist": True,
+            "default_search": "ytsearch1",
         }
 
         with yt_dlp.YoutubeDL(options) as ydl:
-            result = ydl.extract_info(query, download=False)
+            info = ydl.extract_info(query, download=False)
 
-        entries = result.get("entries", [])
-
-        if not entries:
+        if not info:
             return None
 
-        video = entries[0]
+        if "entries" in info:
+            entries = info.get("entries") or []
+
+            if not entries:
+                return None
+
+            info = entries[0]
 
         return {
-            "title": video.get("title"),
-            "url": video.get("url"),
-            "webpage_url": video.get("webpage_url"),
+            "title": info.get("title", "Unknown"),
+            "url": info.get("url"),
+            "webpage_url": info.get("webpage_url"),
+            "duration": info.get("duration", 0),
         }
